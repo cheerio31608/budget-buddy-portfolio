@@ -1,0 +1,84 @@
+{
+  "2026-04-21T14:40:00Z": [
+    {
+      "transaction_id": 101,
+      "description": "4월 월급",
+      "amount": 2500000.0,
+      "transaction_type": "INCOME",
+      "category_id": 1,
+      "category_name": "수입"
+    },
+    {
+      "transaction_id": 102,
+      "description": "아메리카노",
+      "amount": 4500.0,
+      "transaction_type": "EXPENSE",
+      "category_id": 2,
+      "category_name": "식비"
+    },
+    {
+      "transaction_id": 103,
+      "description": "점심 식사",
+      "amount": 12000.0,
+      "transaction_type": "EXPENSE",
+      "category_id": 2,
+      "category_name": "식비"
+    },
+    {
+      "transaction_id": 104,
+      "description": "저녁 배달",
+      "amount": 23000.0,
+      "transaction_type": "EXPENSE",
+      "category_id": 2,
+      "category_name": "식비"
+    },
+    {
+      "transaction_id": 105,
+      "description": "생활용품 구매",
+      "amount": 56000.0,
+      "transaction_type": "EXPENSE",
+      "category_id": 4,
+      "category_name": "주거/통신"
+    },
+    {
+      "transaction_id": 106,
+      "description": "지하철 이용",
+      "amount": 1250.0,
+      "transaction_type": "EXPENSE",
+      "category_id": 3,
+      "category_name": "교통비"
+    },
+    {
+      "transaction_id": 107,
+      "description": "카페 라떼",
+      "amount": 4800.0,
+      "transaction_type": "EXPENSE",
+      "category_id": 2,
+      "category_name": "식비"
+    },
+    {
+      "transaction_id": 108,
+      "description": "음악 스트리밍",
+      "amount": 13900.0,
+      "transaction_type": "EXPENSE",
+      "category_id": 6,
+      "category_name": "문화/여가"
+    },
+    {
+      "transaction_id": 109,
+      "description": "저녁 외식",
+      "amount": 35000.0,
+      "transaction_type": "EXPENSE",
+      "category_id": 2,
+      "category_name": "식비"
+    },
+    {
+      "transaction_id": 110,
+      "description": "상품 환불",
+      "amount": 15000.0,
+      "transaction_type": "INCOME",
+      "category_id": 1,
+      "category_name": "수입"
+    }
+  ]
+}

@@ -1,0 +1,97 @@
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  frontend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+        env:
+          VITE_API_BASE_URL: https://api.example.com
+
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      DB_NAME: budget_buddy_ci
+      DB_USERNAME: budget_buddy_ci
+      DB_PORT: '5433'
+      APP_PORT: '8080'
+    defaults:
+      run:
+        working-directory: budget-buddy
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build and run H2 and PostgreSQL tests
+        run: |
+          chmod +x gradlew
+          ./gradlew build postgresTest --no-daemon
+
+      - name: Set up Node for browser request tests
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify retry keys
+        run: node --test frontend-tests/transaction-request.test.mjs
+
+      - name: Create temporary CI database password
+        shell: bash
+        run: |
+          ci_password=$(openssl rand -hex 24)
+          echo "::add-mask::$ci_password"
+          echo "DB_PASSWORD=$ci_password" >> "$GITHUB_ENV"
+
+      - name: Build and start Compose environment
+        id: compose
+        working-directory: .
+        run: |
+          docker compose config --quiet
+          docker compose up --build -d --wait --wait-timeout 120
+          curl -fsS --retry 20 --retry-delay 3 --retry-connrefused http://localhost:8080/api/auth/csrf > /dev/null
+
+      - name: Stop CI containers
+        if: always() && steps.compose.outcome != 'skipped'
+        working-directory: .
+        run: docker compose down
+
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: budget-buddy/build/reports/tests/
+          retention-days: 7

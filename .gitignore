@@ -1,0 +1,26 @@
+# IDE and operating system files
+.vscode/
+.idea/
+*.iml
+.DS_Store
+Thumbs.db
+
+# Gradle outputs (the wrapper JAR remains tracked)
+**/.gradle/
+**/build/
+**/bin/
+
+# Local secrets and generated scratch files
+.env
+**/.env
+**/.env.*
+!**/.env.example
+**/application-local.properties
+tmp/
+output/
+**/node_modules/
+**/dist/
+**/coverage/
+**/application-secret.properties
+**/application-secret.yml
+**/application-secret.yaml

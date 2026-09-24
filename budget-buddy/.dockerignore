@@ -1,0 +1,12 @@
+.git
+.gradle
+build
+bin
+.idea
+.vscode
+.env
+.env.*
+**/application-secret.*
+**/application-local.properties
+docs
+sample-data

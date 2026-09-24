@@ -1,0 +1,33 @@
+# Optional Render Blueprint. Applying this file can create a billable service;
+# select your service plan in Render deliberately. No database is provisioned here.
+services:
+  - type: web
+    name: budget-buddy-api
+    runtime: docker
+    rootDir: budget-buddy
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/health
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: DB_URL
+        sync: false
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: FRONTEND_ORIGIN
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: TZ
+        value: Asia/Seoul
+      - key: AI_DAILY_USER_LIMIT
+        value: '3'
+      - key: AI_DAILY_GLOBAL_LIMIT
+        value: '30'
+      - key: AI_COOLDOWN_SECONDS
+        value: '60'

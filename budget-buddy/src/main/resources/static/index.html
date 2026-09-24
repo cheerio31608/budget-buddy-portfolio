@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="거래 데이터와 AI 해석을 연결하는 가계부 분석 서비스">
+    <title>Budget Buddy</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<div id="login-screen" class="login-screen">
+    <section class="login-copy">
+        <a class="brand brand-light" href="/">
+            <span class="brand-mark">B</span>
+            <span>Budget Buddy</span>
+        </a>
+        <div class="login-message">
+            <span class="eyebrow light">PERSONAL FINANCE, CLEARLY</span>
+            <h1>숫자는 정확하게,<br>소비는 이해하기 쉽게.</h1>
+            <p>거래와 잔액의 정합성을 지키면서, 내 소비 흐름을 한눈에 확인하세요.</p>
+        </div>
+        <div class="feature-pills">
+            <span>서버 통계 분석</span><span>Gemini 소비 리포트</span><span>CSV 임시 분석</span>
+        </div>
+    </section>
+    <section class="login-panel">
+        <form id="login-form" class="login-card">
+            <div class="mobile-brand">
+                <span class="brand-mark">B</span><strong>Budget Buddy</strong>
+            </div>
+            <span class="eyebrow">WELCOME BACK</span>
+            <h2>내 가계부 열기</h2>
+            <p class="muted">Budget Buddy 계정으로 안전하게 로그인합니다.</p>
+            <label>
+                이메일
+                <input id="login-email" name="email" type="email" autocomplete="username" value="user1@test.com" required>
+            </label>
+            <label>
+                비밀번호
+                <input id="login-password" name="password" type="password" autocomplete="current-password" value="password" required>
+            </label>
+            <p id="login-error" class="form-error" role="alert"></p>
+            <button class="button primary wide" type="submit">대시보드 시작하기</button>
+            <p class="demo-hint"><strong>데모 계정</strong> user1@test.com / password</p>
+            <p class="security-note">DB 접속 정보는 브라우저에 입력하거나 저장하지 않습니다.</p>
+        </form>
+    </section>
+</div>
+
+<div id="app" class="app hidden">
+    <aside id="app-sidebar" class="sidebar">
+        <a class="brand" href="#dashboard" data-view-link="dashboard">
+            <span class="brand-mark">B</span>
+            <span>Budget Buddy</span>
+        </a>
+        <nav class="nav" aria-label="주 메뉴">
+            <button type="button" class="nav-item active" data-view="dashboard" aria-current="page"><span aria-hidden="true">⌂</span>대시보드</button>
+            <button type="button" class="nav-item" data-view="transactions"><span aria-hidden="true">↕</span>거래 내역</button>
+            <button type="button" class="nav-item" data-view="ai"><span aria-hidden="true">✦</span>AI 리포트</button>
+            <button type="button" class="nav-item" data-view="csv"><span aria-hidden="true">⇧</span>CSV 분석</button>
+        </nav>
+        <div class="sidebar-foot">
+            <div class="user-chip">
+                <span class="avatar">U</span>
+                <div><strong id="user-name">사용자</strong><small id="user-email"></small></div>
+            </div>
+            <button id="logout-button" class="text-button" type="button">로그아웃</button>
+        </div>
+    </aside>
+
+    <div class="workspace">
+        <header class="topbar">
+            <button id="menu-button" class="icon-button mobile-only" type="button" aria-label="메뉴 열기" aria-controls="app-sidebar" aria-expanded="false">☰</button>
+            <div>
+                <p id="page-kicker" class="page-kicker">OVERVIEW</p>
+                <h1 id="page-title">대시보드</h1>
+            </div>
+            <div class="top-actions">
+                <span id="today-label" class="date-chip"></span>
+                <button id="quick-add-button" class="button primary" type="button">＋ 거래 추가</button>
+            </div>
+        </header>
+
+        <main id="main-content">
+            <section id="view-dashboard" class="view active-view">
+                <div id="dashboard-loading" class="loading-card">가계부를 정리하고 있어요…</div>
+                <div id="dashboard-content" class="hidden">
+                    <div id="demo-banner" class="demo-banner hidden"><div><span class="eyebrow">LOCAL DEMO</span><strong>아직 등록된 거래가 없습니다</strong><p>재현 가능한 샘플 거래를 한 번 넣고 대시보드와 AI 분석을 체험해 보세요.</p></div><button id="generate-demo-button" class="button secondary" type="button">샘플 거래 30건 넣기</button></div>
+                    <div class="metric-grid">
+                        <article class="metric-card accent-card">
+                            <div class="metric-heading"><span>현재 잔액</span><span class="metric-icon">₩</span></div>
+                            <strong id="metric-balance">0원</strong>
+                            <small>거래 반영 후 실제 잔액</small>
+                        </article>
+                        <article class="metric-card">
+                            <div class="metric-heading"><span>이번 달 수입</span><span class="status income">수입</span></div>
+                            <strong id="metric-income">0원</strong>
+                            <small id="income-caption">0건의 거래</small>
+                        </article>
+                        <article class="metric-card">
+                            <div class="metric-heading"><span>이번 달 지출</span><span class="status expense">지출</span></div>
+                            <strong id="metric-expense">0원</strong>
+                            <small id="expense-change">이전 기간 데이터 없음</small>
+                        </article>
+                        <article class="metric-card">
+                            <div class="metric-heading"><span>가장 큰 소비 영역</span><span class="metric-icon soft">◎</span></div>
+                            <strong id="metric-category" class="text-metric">-</strong>
+                            <small id="category-caption">아직 지출이 없어요</small>
+                        </article>
+                    </div>
+
+                    <div class="dashboard-grid">
+                        <article class="card span-2">
+                            <div class="card-head"><div><span class="eyebrow">TREND</span><h2>월별 지출 추이</h2></div><span class="legend-dot expense-dot">지출</span></div>
+                            <div id="monthly-chart" class="line-chart"></div>
+                        </article>
+                        <article class="card">
+                            <div class="card-head"><div><span class="eyebrow">BREAKDOWN</span><h2>카테고리별 지출</h2></div></div>
+                            <div id="category-chart" class="donut-wrap"></div>
+                        </article>
+                        <article class="card span-2">
+                            <div class="card-head"><div><span class="eyebrow">RECENT 8 WEEKS</span><h2>최근 소비 변화</h2></div><span class="legend-dot expense-dot">주간 지출</span></div>
+                            <div id="weekly-chart" class="line-chart"></div>
+                        </article>
+                        <article class="card insight-card">
+                            <span class="eyebrow light">THIS MONTH</span>
+                            <h2>소비 하이라이트</h2>
+                            <dl class="insight-list">
+                                <div><dt>가장 자주 찾은 곳</dt><dd id="highlight-vendor">-</dd></div>
+                                <div><dt>평균 지출 금액</dt><dd id="highlight-average">0원</dd></div>
+                                <div><dt>가장 큰 지출</dt><dd id="highlight-largest">-</dd></div>
+                                <div><dt>총 거래 건수</dt><dd id="highlight-count">0건</dd></div>
+                            </dl>
+                        </article>
+                        <article class="card span-3">
+                            <div class="card-head"><div><span class="eyebrow">CASH FLOW</span><h2>수입과 지출 비교</h2></div></div>
+                            <div id="cashflow-chart" class="bar-chart"></div>
+                        </article>
+                    </div>
+
+                    <article class="card recent-card">
+                        <div class="card-head"><div><span class="eyebrow">RECENT</span><h2>최근 거래</h2></div><button class="text-button link-view" type="button" data-view="transactions">전체 보기 →</button></div>
+                        <div class="table-scroll"><table><thead><tr><th>날짜</th><th>사용처</th><th>카테고리</th><th>구분</th><th class="align-right">금액</th></tr></thead><tbody id="recent-transactions"></tbody></table></div>
+                    </article>
+                </div>
+            </section>
+
+            <section id="view-transactions" class="view">
+                <article class="card filter-card">
+                    <div class="filter-row">
+                        <label class="search-field"><span aria-hidden="true">⌕</span><input id="transaction-search" type="search" aria-label="사용처 또는 메모로 거래 검색" placeholder="사용처 또는 메모 검색"></label>
+                        <label>시작일<input id="filter-start" type="date"></label>
+                        <label>종료일<input id="filter-end" type="date"></label>
+                        <label>카테고리<select id="filter-category"><option value="">전체 카테고리</option></select></label>
+                        <button id="filter-reset" class="button secondary" type="button">초기화</button>
+                    </div>
+                </article>
+                <article class="card">
+                    <div class="card-head"><div><span class="eyebrow">TRANSACTIONS</span><h2>거래 내역</h2></div><span id="transaction-count" class="count-badge">0건</span></div>
+                    <div class="table-scroll"><table class="transaction-table"><thead><tr><th>발생일</th><th>사용처 / 메모</th><th>카테고리</th><th>구분</th><th>등록 후 잔액</th><th class="align-right">금액</th></tr></thead><tbody id="transaction-list"></tbody></table></div>
+                </article>
+            </section>
+
+            <section id="view-ai" class="view">
+                <article class="ai-hero">
+                    <div><span class="eyebrow light">GEMINI ANALYSIS</span><h2>계산된 통계에<br>이해하기 쉬운 해석을 더합니다.</h2><p>원본 거래 전체가 아니라 서버에서 집계한 금액과 패턴만 AI에 전달합니다.</p></div>
+                    <button id="generate-ai-button" class="button white" type="button">✦ 이번 달 리포트 생성</button>
+                </article>
+                <div class="section-title"><div><span class="eyebrow">REPORT ARCHIVE</span><h2>저장된 AI 리포트</h2></div></div>
+                <div id="ai-report-list" class="report-list"></div>
+            </section>
+
+            <section id="view-csv" class="view">
+                <div class="csv-intro">
+                    <div><span class="eyebrow">TEMPORARY ANALYSIS</span><h2>내 CSV로 Budget Buddy 체험하기</h2><p>파일은 분석 요청 동안만 처리되며 거래 테이블에 저장되지 않습니다.</p></div>
+                    <div class="privacy-badge">◆ DB 저장 안 함</div>
+                </div>
+                <ol class="steps" aria-label="CSV 분석 단계">
+                    <li class="active" data-step="1" aria-current="step"><span>1</span>파일 선택</li>
+                    <li data-step="2"><span>2</span>미리보기</li>
+                    <li data-step="3"><span>3</span>컬럼 매핑</li>
+                    <li data-step="4"><span>4</span>검증</li>
+                    <li data-step="5"><span>5</span>분석 결과</li>
+                </ol>
+
+                <article class="card upload-card">
+                    <div id="drop-zone" class="drop-zone">
+                        <div class="upload-icon">⇧</div>
+                        <h3>CSV 파일을 선택하거나 여기에 놓으세요</h3>
+                        <p>UTF-8·MS949, 쉼표·탭·세미콜론 구분 / 최대 5MB</p>
+                        <label class="button primary" for="csv-file">파일 선택</label>
+                        <input id="csv-file" type="file" accept=".csv,text/csv" hidden>
+                    </div>
+                    <div id="selected-file" class="selected-file hidden"></div>
+                </article>
+
+                <article id="preview-card" class="card hidden">
+                    <div class="card-head"><div><span class="eyebrow">STEP 2</span><h2>데이터 미리보기</h2></div><span id="csv-row-count" class="count-badge"></span></div>
+                    <div class="table-scroll"><table><thead id="preview-head"></thead><tbody id="preview-body"></tbody></table></div>
+                </article>
+
+                <article id="mapping-card" class="card hidden">
+                    <div class="card-head"><div><span class="eyebrow">STEP 3</span><h2>컬럼 연결</h2><p class="muted">Budget Buddy 필드와 CSV 컬럼을 확인해 주세요.</p></div></div>
+                    <div id="mapping-grid" class="mapping-grid"></div>
+                    <div class="card-actions"><button id="analyze-csv-button" class="button primary" type="button">검증하고 분석하기 →</button></div>
+                </article>
+
+                <article id="validation-card" class="card hidden">
+                    <div class="card-head"><div><span class="eyebrow">STEP 4</span><h2>데이터 검증 결과</h2></div></div>
+                    <div id="validation-summary" class="validation-grid"></div>
+                    <div id="csv-errors" class="error-list"></div>
+                </article>
+
+                <div id="csv-result" class="hidden">
+                    <div class="section-title"><div><span class="eyebrow">STEP 5</span><h2>CSV 소비 분석</h2><p class="muted csv-ai-note">AI 해석을 생성하면 원본 파일이 아닌 정상 행의 집계 통계만 Gemini에 전달됩니다.</p></div><button id="csv-ai-button" class="button secondary" type="button">✦ AI 해석 생성</button></div>
+                    <div id="csv-metrics" class="metric-grid csv-metrics"></div>
+                    <div class="dashboard-grid">
+                        <article class="card span-2"><div class="card-head"><h2>월별 지출 추이</h2></div><div id="csv-monthly-chart" class="line-chart"></div></article>
+                        <article class="card"><div class="card-head"><h2>카테고리별 지출</h2></div><div id="csv-category-chart" class="donut-wrap"></div></article>
+                    </div>
+                    <article id="csv-ai-report" class="card report-card hidden"></article>
+                </div>
+            </section>
+        </main>
+    </div>
+</div>
+
+<dialog id="transaction-dialog">
+    <form id="transaction-form" method="dialog" class="dialog-form">
+        <div class="dialog-head"><div><span class="eyebrow">NEW TRANSACTION</span><h2>거래 추가</h2></div><button type="button" class="icon-button" aria-label="거래 추가 창 닫기" data-close-dialog>×</button></div>
+        <div class="form-grid">
+            <label>구분<select id="new-type" required><option value="EXPENSE">지출</option><option value="INCOME">수입</option></select></label>
+            <label>카테고리<select id="new-category" required></select></label>
+            <label>금액<input id="new-amount" type="number" min="1" step="0.01" placeholder="0" required></label>
+            <label>거래 일시<input id="new-date" type="datetime-local" required></label>
+            <label class="full">사용처<input id="new-vendor" maxlength="255" placeholder="예: 동네 마트"></label>
+            <label class="full">메모<input id="new-description" maxlength="500" placeholder="선택 입력"></label>
+        </div>
+        <p id="transaction-error" class="form-error" role="alert"></p>
+        <div class="dialog-actions"><button type="button" class="button secondary" data-close-dialog>취소</button><button type="submit" class="button primary">저장하기</button></div>
+    </form>
+</dialog>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script type="module" src="/app.js"></script>
+</body>
+</html>
