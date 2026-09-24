@@ -163,7 +163,7 @@ Origin에는 끝 /나 경로를 붙이지 않습니다. 필요하면 주소를 �
 
 ## Deployment: Supabase → Render → Vercel
 
-계정 생성·요금제 선택·Secret 입력·외부 공개는 직접 결정해야 합니다. 현재 서비스 요금/제한을 먼저 확인하세요. 이번 작업에서는 가입·외부 배포·push를 하지 않았습니다.
+코드는 공개 GitHub 저장소에 올라가 있지만 웹 서비스는 아직 배포되지 않았습니다. Supabase·Render·Vercel의 계정, 요금제, Secret 설정은 배포 전에 직접 확인하세요.
 
 ### 1. Supabase PostgreSQL
 
@@ -185,7 +185,7 @@ prod는 자동 baseline을 하지 않습니다. 스키마가 있는데 Flyway �
 
 ### 2. Render Backend
 
-1. 검토한 변경을 GitHub feature/web-deployment에 commit/push한 뒤 Web Service를 만듭니다.
+1. 공개 저장소의 `main` 브랜치를 연결해 Web Service를 만듭니다.
 2. Runtime **Docker**, Root Directory **budget-buddy**, Dockerfile **./Dockerfile**, Build context **.**.
 3. SPRING_PROFILES_ACTIVE=prod, DB 3개 값, JWT_SECRET, FRONTEND_ORIGIN, TZ=Asia/Seoul을 설정합니다. AI를 쓸 때 GEMINI_API_KEY도 설정합니다.
 4. JWT_SECRET은 안전한 랜덤 값(32바이트 이상)을 사용합니다. Blueprint의 generateValue도 가능합니다. 여러 서버는 같은 키를 공유합니다. 변경하면 기존 토큰은 무효화됩니다.
@@ -197,7 +197,7 @@ prod는 자동 baseline을 하지 않습니다. 스키마가 있는데 Flyway �
 
 ### 3. Vercel Frontend
 
-1. 같은 GitHub 저장소를 Import합니다. 배포 브랜치는 feature/web-deployment로 지정하거나 검토 후 main에 병합합니다.
+1. 같은 GitHub 저장소를 Import하고 배포 브랜치를 `main`으로 지정합니다.
 2. Root Directory **frontend**, Framework **Vite**, Install **npm ci**, Build **npm run build**, Output **dist**, Node **22.x 이상**.
 3. VITE_API_BASE_URL=https://<render-backend>를 넣습니다. /api 접미사는 붙이지 않습니다.
 4. Vercel 주소를 Render의 FRONTEND_ORIGIN에 정확히 등록하고 백엔드를 재시작합니다. Preview 주소는 각각 명시적으로 추가합니다.
@@ -290,7 +290,7 @@ Invoke-RestMethod http://localhost:8080/api/web-auth/logout -Method Post -Header
 - AI 한도는 DB에 먼저 예약하여 동시/다중 인스턴스 요청도 제한합니다. Gemini 원격 호출 실패는 시도 횟수에 포함되지만, 로컬 API Key 미설정은 예약 전에 안내합니다. Gemini 호출은 DB 트랜잭션 밖, 연결 5초/읽기 40초, 출력 최대 4,096토큰.
 - 원본 전체 대신 집계(사용처/카테고리 포함)가 Google로 전달됩니다. 입력 안 명령을 따르지 않도록 프롬프트를 작성하고, 결과는 HTML이 아닌 텍스트로 표시합니다.
 - 로그인 제한은 인스턴스 메모리/IP 기준 30회/분. 프록시 뒤에서는 같은 IP로 보일 수 있습니다. 전달 헤더를 무조건 신뢰하지 않습니다.
-- 접근 가능한 Git 이력의 알려진 Google API key/private-key 패턴 검사에서 일치 없음(루트 30개, 기존 nested 저장소 2개 커밋). **모든 형태의 Secret 부재를 증명하는 검사는 아닙니다.** 노출 의심 시 키 폐기/재발급이 먼저입니다.
+- 이 공개 저장소는 기존 비공개 저장소의 Git 이력을 복사하지 않고 최신 파일로 새로 시작했습니다. 로컬 `.env`는 포함하지 않았습니다. **Secret 노출이 의심되면 해당 키를 폐기하고 재발급하세요.**
 
 ## 복습·다음 단계
 
