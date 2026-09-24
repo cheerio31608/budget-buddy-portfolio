@@ -2,11 +2,11 @@
 
 [![CI](https://github.com/cheerio31608/budget-buddy-portfolio/actions/workflows/ci.yml/badge.svg)](https://github.com/cheerio31608/budget-buddy-portfolio/actions/workflows/ci.yml)
 
-**거래와 CSV 가계부를 소비 패턴으로 설명하는 웹 가계부.** Java/Spring Boot의 잔액 정합성·동시성·사용자 데이터 격리를 중심으로 만든 개인 백엔드 포트폴리오입니다.
+거래를 기록하고, 월별 소비 흐름을 살펴보는 가계부입니다.
 
-기존 도메인·API·통계 엔진을 유지하면서 React 웹 화면과 공개 서비스용 인증을 추가했습니다. 계산은 Java BigDecimal, Gemini는 집계 결과의 해석만 맡습니다. 실제 결제·투자 조언 서비스가 아닙니다. 가상 데이터로 체험해 주세요.
+처음에는 백엔드에서 거래와 잔액을 안전하게 다루는 데 집중했습니다. 같은 사용자의 요청이 겹치거나 네트워크 문제로 같은 거래가 다시 전송돼도 잔액이 틀어지지 않도록 트랜잭션, 비관적 락, 멱등 키를 적용했습니다. 이후 직접 사용해 볼 수 있도록 React 화면과 회원 인증을 붙이고, CSV 분석과 Gemini 소비 리포트까지 연결했습니다.
 
-> 배포 설정을 제공하지만 사이트가 이미 공개된 것은 아닙니다. Vercel/Render/Supabase 연결과 Secret 입력은 운영자가 직접 해야 합니다. 실제 클라우드 기동·실제 Gemini 호출은 아직 검증하지 않았습니다.
+합계와 통계는 Java에서 계산하고, Gemini는 결과를 읽기 쉬운 말로 설명합니다. 서비스 배포와 실제 Gemini API 호출은 아직 확인 중입니다. 실제 금융 데이터 대신 가상 데이터로 체험해 주세요. 이 서비스는 결제·투자 조언을 제공하지 않습니다.
 
 ## Features
 
